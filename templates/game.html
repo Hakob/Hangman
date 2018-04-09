@@ -57,5 +57,14 @@ function check_if_exists_in_word(button) {
         </tr>
         </tbody>
     </table>
+    <button onclick="window.location.href='{% url 'game' %}'">Start Again</button>
+
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
 </div>
 {% endblock %}

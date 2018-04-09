@@ -1,0 +1,6 @@
+.idea/
+__pycache__/
+django_sessions/
+venv/
+
+db.sqlite3

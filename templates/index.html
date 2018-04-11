@@ -1,5 +1,18 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<button onclick="window.location.href='{% url 'game' %}'">Start</button>
+
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+        <button onclick="window.location.href='{% url 'game' %}'">Start Again</button>
+
+    {% else %}
+        <button onclick="window.location.href='{% url 'game' %}'">Start</button>
+
+    {% endif %}
+
 {% endblock %}

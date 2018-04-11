@@ -6,32 +6,18 @@ from django.shortcuts import render
 from django.contrib import messages
 # Third-party app imports
 # Imports from your apps
-from .models import WordsModel
+from .sessions import initialize_session, clear_session
 
 GAME_OVER_MSG = "Your chances have expired"
 WINNER_MSG = "You have guessed the word!!!"
 
-CHANCES = 7
+YOUR_CHANCES_HAVE_EXPIRED = 0
 WORD_IS_GUESSED = -1
 LETTER_IS_NOT_IN_WORD = -2
-YOUR_CHANCES_HAVE_EXPIRED = None
-
-
-def initialize_session(request):
-    request.session['chances'] = CHANCES
-    current_word = WordsModel.words.random()
-    current_word = str(current_word)
-    word_letters = list(enumerate(current_word))
-    request.session['word_letters'] = word_letters
-    return len(current_word)
-
-
-def clear_session(request):
-    request.session.flush()
 
 
 class GuessWordView(View):
-    template_name = 'game.html'
+    template_name = ''
 
     @staticmethod
     def check_if_letter_is_in_word(request, letter):
@@ -45,7 +31,7 @@ class GuessWordView(View):
         if not request.session['word_letters']:
             clear_session(request)
             messages.add_message(request, messages.SUCCESS, WINNER_MSG)
-            return render(request, 'game.html')
+            return WORD_IS_GUESSED
 
         if matched_indexes:
             return JsonResponse({'failed': 0, 'indexes': matched_indexes})
@@ -54,16 +40,29 @@ class GuessWordView(View):
         if not request.session['chances']:
             clear_session(request)
             messages.add_message(request, messages.INFO, GAME_OVER_MSG)
-            return render(request, 'game.html')
-        return JsonResponse({'failed': 1})
+            return YOUR_CHANCES_HAVE_EXPIRED
+        return LETTER_IS_NOT_IN_WORD
 
     def get(self, request):
         clear_session(request)
-        count = initialize_session(request)
-        context = {'letters_count': list(range(count))}
+        initialize_session(request)
+        count = len(request.session['word_letters'])
+        count_range = list(range(count))
+        context = {'count_range': count_range}
         return render(request, self.template_name, context=context)
 
     def post(self, request):
         letter = request.POST.get('letter')
-        response = self.check_if_letter_is_in_word(request, letter)
-        return response
+        state = self.check_if_letter_is_in_word(request, letter)
+
+        if state == WORD_IS_GUESSED:
+            return render(request, 'index.html')
+
+        elif state == LETTER_IS_NOT_IN_WORD:
+            return JsonResponse({'failed': 1})
+
+        elif state == YOUR_CHANCES_HAVE_EXPIRED:
+            return render(request, 'index.html')
+
+        else:
+            return state

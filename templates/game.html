@@ -1,22 +1,24 @@
-{% extends 'base.html' %} {% block scripts %}
+{% extends 'base.html' %}
+
+{% block scripts %}
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script>
 function check_if_exists_in_word(button) {
     button.disabled = true;
+    let letter = button.getAttribute("data-letter");
     $.ajax({
         url: "{% url 'game' %}",
         contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
         type: "POST",
         data: {
-            'letter': button.getAttribute("data-letter")
+            'letter': letter
         },
         success: function(guess, status, jqXHR) {
             if( jqXHR.getResponseHeader('content-type').indexOf('text/html') >= 0 ) {
                 $("html").html(guess);
             } 
             else {
-                if (!guess['failed']) {
-                    let letter = button.getAttribute("data-letter");
+                if ( guess['failed'] !== 1 ) {
                     for (let i = 0; i < guess['indexes'].length; i++) {
                         $('#' + guess['indexes'][i]).text(letter);
                     }
@@ -26,45 +28,45 @@ function check_if_exists_in_word(button) {
     });
 }
 </script>
-{% endblock %} {% block content %}
+{% endblock %}
+
+{% block content %}
 <div>
     <table>
         <tr>
-            {% for c in letters_count %}
+            {% for cnt in count_range %}
             <td>
-                <button style="height:5em; width:5em;" type="button" name="display" id="{{ c }}" disabled>*
-                </button>
+                <button style="height:5em; width:5em;" type="button" name="display" id="{{ cnt }}" disabled> * </button>
             </td>
             {% endfor %}
         </tr>
     </table>
     <table>
         <tr>
-            {% with 'a b c d e f g h i j k l m' as letters %} {% for letter in letters.split %}
+            {% with 'a b c d e f g h i j k l m' as letters %}
+                {% for letter in letters.split %}
             <td>
-                <button style="height:2.5em; width:2.5em;" type="button" data-letter="{{ letter }}" onclick="check_if_exists_in_word(this)">{{ letter }}
+                <button style="height:2.5em; width:2.5em;" type="button" data-letter="{{ letter }}" onclick="check_if_exists_in_word(this)">
+                    {{ letter }}
                 </button>
             </td>
-            {% endfor %} {% endwith %}
+                {% endfor %}
+            {% endwith %}
         </tr>
         <tr>
-            {% with 'n o p q r s t u v w x y z' as letters %} {% for letter in letters.split %}
+            {% with 'n o p q r s t u v w x y z' as letters %}
+                {% for letter in letters.split %}
             <td>
-                <button style="height:2.5em; width:2.5em;" type="button" data-letter="{{ letter }}" onclick="check_if_exists_in_word(this)">{{ letter }}
+                <button style="height:2.5em; width:2.5em;" type="button" data-letter="{{ letter }}" onclick="check_if_exists_in_word(this)">
+                    {{ letter }}
                 </button>
             </td>
-            {% endfor %} {% endwith %}
+                {% endfor %}
+            {% endwith %}
         </tr>
         </tbody>
     </table>
     <button onclick="window.location.href='{% url 'game' %}'">Start Again</button>
 
-    {% if messages %}
-        <ul class="messages">
-            {% for message in messages %}
-                <li>{{ message }}</li>
-            {% endfor %}
-        </ul>
-    {% endif %}
 </div>
 {% endblock %}

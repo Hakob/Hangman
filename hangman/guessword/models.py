@@ -1,13 +1,7 @@
-# Stdlib imports
 from random import randint
 
-# Core Django imports
 from django.db import models
 from django.db.models.aggregates import Count
-
-# Third-party app imports
-
-# Imports from your apps
 
 
 class WordsManager(models.Manager):

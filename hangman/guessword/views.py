@@ -1,12 +1,9 @@
-# Stdlib imports
-# Core Django imports
 from django.views import View
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.contrib import messages
-# Third-party app imports
-# Imports from your apps
-from .sessions import initialize_session, clear_session
+
+from .utils import initialize_session, clear_session
 
 GAME_OVER_MSG = "Your chances have expired"
 WINNER_MSG = "You have guessed the word!!!"

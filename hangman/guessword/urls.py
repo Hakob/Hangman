@@ -1,15 +1,20 @@
 from django.urls import path
 
-from .views import GuessWordView
+from .views import initpage, StartPageView, GuessWordView
 
 urlpatterns = [
     path(route='',
-         view=GuessWordView.as_view(template_name='index.html'),
+         view=initpage,
          name='index'
          ),
 
     path(route='hangman/',
-         view=GuessWordView.as_view(template_name='game.html'),
+         view=StartPageView.as_view(),
          name='game'
+         ),
+
+    path(route='check/',
+         view=GuessWordView.as_view(),
+         name='check'
          ),
 ]

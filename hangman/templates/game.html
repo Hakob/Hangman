@@ -1,46 +1,19 @@
 {% extends 'base.html' %}
 
-{% block scripts %}
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<script>
-function check_if_exists_in_word(button) {
-    button.disabled = true;
-    let letter = button.getAttribute("data-letter");
-    $.ajax({
-        url: "{% url 'game' %}",
-        contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
-        type: "POST",
-        data: {
-            'letter': letter
-        },
-        success: function(guess, status, jqXHR) {
-            if( jqXHR.getResponseHeader('content-type').indexOf('text/html') >= 0 ) {
-                $("html").html(guess);
-            } 
-            else {
-                if ( guess['failed'] !== 1 ) {
-                    for (let i = 0; i < guess['indexes'].length; i++) {
-                        $('#' + guess['indexes'][i]).text(letter);
-                    }
-                }
-            }
-        }
-    });
-}
-</script>
-{% endblock %}
 
-{% block content %}
-<div>
+{% block word %}
     <table>
         <tr>
             {% for cnt in count_range %}
-            <td>
-                <button style="height:5em; width:5em;" type="button" name="display" id="{{ cnt }}" disabled> * </button>
-            </td>
+            <td style="height:5em; width:5em; text-align:center;" id="{{ cnt }}"><b>*</b></td>
             {% endfor %}
         </tr>
     </table>
+
+   {% endblock %}
+
+{% block keyboard %}
+
     <table>
         <tr>
             {% with 'a b c d e f g h i j k l m' as letters %}
@@ -68,5 +41,35 @@ function check_if_exists_in_word(button) {
     </table>
     <button onclick="window.location.href='{% url 'game' %}'">Start Again</button>
 
-</div>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script>
+function check_if_exists_in_word(button) {
+    button.disabled = true;
+    let letter = button.getAttribute("data-letter");
+    $.ajax({
+        url: "{% url 'check' %}",
+        contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+        type: "GET",
+        data: {
+            'letter': letter
+        },
+        success: function(guess, status, jqXHR) {
+            if( jqXHR.getResponseHeader('content-type').indexOf('text/html') >= 0 ) {
+                $("html").html(guess);
+            }
+            else {
+                if ( guess['failed'] !== 1 ) {
+                    for (let i = 0; i < guess['indexes'].length; i++) {
+                        $('#' + guess['indexes'][i]).text(letter);
+                    }
+                }
+            }
+        }
+    });
+}
+</script>
 {% endblock %}

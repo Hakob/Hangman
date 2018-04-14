@@ -7,10 +7,12 @@
 </head>
 
 <body>
-{% block content %}
-{% endblock %}
+    <header>
+        {% block word %} {% endblock %}
+    </header>
+    <main>
+        {% block keyboard %} {% endblock %}
+    </main>
 </body>
-
-{% block scripts %}
-{% endblock %}
+{% block scripts %} {% endblock %}
 </html>

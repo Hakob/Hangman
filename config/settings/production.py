@@ -1,30 +1,19 @@
-import os
-
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from .base import *
 
 
-SECRET_KEY = 'phx(0-_u(7-xg-5w28vnidfvdivja5fxh6n47dbszex(5c)6i0mdb4f'
+if 'DJANGO_SECRET_KEY' in os.environ:
+	SECRET_KEY = os.environ['DJANGO_SECRET_KEY']
+else:
+	print('SECRET_KEY value is hardcoded into settings')
+	SECRET_KEY = '5w28vnidfphx(0-_u(7-xg-vdivja5fxh6n47dbszex(5c)6i0mdb4f'
+
 
 DEBUG = False
 
 ALLOWED_HOSTS = ['127.0.0.1']
 
 
-TEMPLATES = [
-    {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'hangman', 'templates')],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-            ],
-        },
-    },
-]
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
 DATABASES = {
     'default': {
@@ -34,19 +23,3 @@ DATABASES = {
         }
     }
 }
-
-AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
-]
-

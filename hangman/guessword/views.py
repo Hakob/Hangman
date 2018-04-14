@@ -3,42 +3,46 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from django.contrib import messages
 
-from .utils import initialize_session, clear_session
+from .utils import initialize_session, clear_session, is_letter_exists
+from .utils import YOUR_CHANCES_HAVE_EXPIRED, WORD_IS_GUESSED, LETTER_IS_NOT_IN_WORD, MATCHED
 
-GAME_OVER_MSG = "Your chances have expired"
-WINNER_MSG = "You have guessed the word!!!"
 
-YOUR_CHANCES_HAVE_EXPIRED = 0
-WORD_IS_GUESSED = -1
-LETTER_IS_NOT_IN_WORD = -2
+def initpage(request):
+    return render(request, 'index.html')
 
 
 class GuessWordView(View):
-    template_name = ''
+    template_name = 'end.html'
 
-    @staticmethod
-    def check_if_letter_is_in_word(request, letter):
+    def get(self, request):
+        letter = request.GET.get('letter', '')
+        if not letter.isalpha():
+            return
 
-        matched_indexes = []
-        for idx, item in enumerate(request.session['word_letters']):
-            if letter == item[1]:
-                matched_indexes.append(item[0])
-                request.session['word_letters'].pop(idx)
+        is_letter_exists(request, letter)
+        if request.session['state'] == LETTER_IS_NOT_IN_WORD:
+            return JsonResponse({'failed': 1})
 
-        if not request.session['word_letters']:
+        elif request.session['state'] == MATCHED:
+            response = JsonResponse(
+                {'failed': 0,
+                 'indexes': request.session['matched_indexes']}
+            )
+            return response
+
+        elif request.session['state'] == WORD_IS_GUESSED:
             clear_session(request)
-            messages.add_message(request, messages.SUCCESS, WINNER_MSG)
-            return WORD_IS_GUESSED
+            messages.add_message(request, WORD_IS_GUESSED, "You have guessed the word!!!")
+            return render(request, self.template_name)
 
-        if matched_indexes:
-            return JsonResponse({'failed': 0, 'indexes': matched_indexes})
-
-        request.session['chances'] -= 1
-        if not request.session['chances']:
+        elif request.session['state'] == YOUR_CHANCES_HAVE_EXPIRED:
             clear_session(request)
-            messages.add_message(request, messages.INFO, GAME_OVER_MSG)
-            return YOUR_CHANCES_HAVE_EXPIRED
-        return LETTER_IS_NOT_IN_WORD
+            messages.add_message(request, YOUR_CHANCES_HAVE_EXPIRED, "Your chances have expired")
+            return render(request, self.template_name)
+
+
+class StartPageView(View):
+    template_name = 'game.html'
 
     def get(self, request):
         clear_session(request)
@@ -47,19 +51,3 @@ class GuessWordView(View):
         count_range = list(range(count))
         context = {'count_range': count_range}
         return render(request, self.template_name, context=context)
-
-    def post(self, request):
-        letter = request.POST.get('letter')
-        state = self.check_if_letter_is_in_word(request, letter)
-
-        if state == WORD_IS_GUESSED:
-            return render(request, 'index.html')
-
-        elif state == LETTER_IS_NOT_IN_WORD:
-            return JsonResponse({'failed': 1})
-
-        elif state == YOUR_CHANCES_HAVE_EXPIRED:
-            return render(request, 'index.html')
-
-        else:
-            return state

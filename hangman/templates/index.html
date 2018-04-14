@@ -1,12 +1,17 @@
 {% extends 'base.html' %}
 
-{% block word %}
-
-        <button onclick="start()">Start</button>
-        <script>
-        function start(){
-            window.location.href='{% url 'game' %}';
-        };
-        </script>
-
+{% block header %}
+{% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+    <button onclick="start()">Start</button>
+    <script>
+            function start(){
+                window.location.href='{% url 'game' %}';
+            };
+    </script>
 {% endblock %}

@@ -1,12 +1,1 @@
-{% extends 'base.html' %}
-
-{% block word %}
-        <ul class="messages">
-            {% for message in messages %}
-                <li>{{ message }}</li>
-            {% endfor %}
-        </ul>
-        <button onclick="window.location.reload(true)">Start Again</button>
-        <button onclick="window.location.href='/'">Finish</button>
-
-{% endblock %}
+<meta http-equiv="REFRESH" content="0;{% url 'index' %}">

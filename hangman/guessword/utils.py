@@ -1,39 +1,48 @@
+from django.template import loader
+from django.contrib import messages
+
 from .models import WordsModel
 
-CHANCES = 7
-YOUR_CHANCES_HAVE_EXPIRED = 0
-WORD_IS_GUESSED = -1
-LETTER_IS_NOT_IN_WORD = -2
-MATCHED = -3
+CHANCES = 5
+
+
+def is_end(request):
+    if request.session['chances'] == 0:
+        messages.add_message(request, messages.INFO, "Your chances have expired")
+        clear_session(request)
+        return True
+    elif request.session['guessed_letters'] == request.session['word_letters']:
+        messages.add_message(request, messages.SUCCESS, "You have guessed the word!!!")
+        clear_session(request)
+        return True
+    return False
+
+
+def update_dash(request):
+    template = loader.get_template('dashboard.html')
+    context = {'guessed_letters': request.session['guessed_letters']}
+    rendered = template.render(context)
+    return rendered
 
 
 def is_letter_exists(request, letter):
-    del request.session['matched_indexes'][:]
-    for idx, item in enumerate(request.session['word_letters']):
-        if letter == item[1]:
-            request.session['matched_indexes'].append(item[0])
-            request.session['word_letters'].pop(idx)
 
-    if not request.session['word_letters']:
-        request.session['state'] = WORD_IS_GUESSED
+    if not letter.isalpha():
         return
-    if request.session['matched_indexes']:
-        request.session['state'] = MATCHED
-        return
-    request.session['chances'] -= 1
-    if not request.session['chances']:
-        request.session['state'] = YOUR_CHANCES_HAVE_EXPIRED
-        return
-    request.session['state'] = LETTER_IS_NOT_IN_WORD
-    return
+    count = 0
+    for index, ltr in enumerate(request.session['word_letters']):
+        if letter == ltr:
+            request.session['guessed_letters'][index] = ltr
+            count += 1
+    if not count:
+        request.session['chances'] -= 1
 
 
 def initialize_session(request):
     current_word = WordsModel.words.random()
     current_word = str(current_word)
-    word_letters = list(enumerate(current_word))
-    request.session['word_letters'] = word_letters
-    request.session['matched_indexes'] = []
+    request.session['word_letters'] = list(current_word)
+    request.session['guessed_letters'] = list('*' * len(current_word))
     request.session['chances'] = CHANCES
 
 

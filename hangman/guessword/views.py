@@ -1,10 +1,9 @@
 from django.views import View
-from django.http import JsonResponse
+from django.http import HttpResponse
 from django.shortcuts import render
-from django.contrib import messages
+from django.template import loader
 
-from .utils import initialize_session, clear_session, is_letter_exists
-from .utils import YOUR_CHANCES_HAVE_EXPIRED, WORD_IS_GUESSED, LETTER_IS_NOT_IN_WORD, MATCHED
+from .utils import initialize_session, clear_session, is_letter_exists, update_dash, is_end
 
 
 def initpage(request):
@@ -14,31 +13,15 @@ def initpage(request):
 class GuessWordView(View):
     template_name = 'end.html'
 
-    def get(self, request):
-        letter = request.GET.get('letter', '')
-        if not letter.isalpha():
-            return
-
+    def post(self, request):
+        letter = request.POST.get('letter', '')
         is_letter_exists(request, letter)
-        if request.session['state'] == LETTER_IS_NOT_IN_WORD:
-            return JsonResponse({'failed': 1})
-
-        elif request.session['state'] == MATCHED:
-            response = JsonResponse(
-                {'failed': 0,
-                 'indexes': request.session['matched_indexes']}
-            )
-            return response
-
-        elif request.session['state'] == WORD_IS_GUESSED:
-            clear_session(request)
-            messages.add_message(request, WORD_IS_GUESSED, "You have guessed the word!!!")
-            return render(request, self.template_name)
-
-        elif request.session['state'] == YOUR_CHANCES_HAVE_EXPIRED:
-            clear_session(request)
-            messages.add_message(request, YOUR_CHANCES_HAVE_EXPIRED, "Your chances have expired")
-            return render(request, self.template_name)
+        if is_end(request):
+            template = loader.get_template(self.template_name)
+            rendered = template.render()
+            return HttpResponse(rendered)
+        new_dash = update_dash(request)
+        return HttpResponse(new_dash)
 
 
 class StartPageView(View):
@@ -47,7 +30,5 @@ class StartPageView(View):
     def get(self, request):
         clear_session(request)
         initialize_session(request)
-        count = len(request.session['word_letters'])
-        count_range = list(range(count))
-        context = {'count_range': count_range}
+        context = {'guessed_letters': request.session['guessed_letters']}
         return render(request, self.template_name, context=context)

@@ -1,45 +1,46 @@
 {% extends 'base.html' %}
 
+{% block header %}
+<table>
+    <tr>
+        {% for letter in guessed_letters %}
+        <td style="height:5em; width:5em; text-align:center;"><b>{{ letter }}</b></td>
+        {% endfor %}
+    </tr>
+</table>
 
-{% block word %}
-    <table>
-        <tr>
-            {% for cnt in count_range %}
-            <td style="height:5em; width:5em; text-align:center;" id="{{ cnt }}"><b>*</b></td>
-            {% endfor %}
-        </tr>
-    </table>
-
-   {% endblock %}
+{% endblock %}
 
 {% block keyboard %}
 
-    <table>
-        <tr>
-            {% with 'a b c d e f g h i j k l m' as letters %}
-                {% for letter in letters.split %}
-            <td>
-                <button style="height:2.5em; width:2.5em;" type="button" data-letter="{{ letter }}" onclick="check_if_exists_in_word(this)">
-                    {{ letter }}
-                </button>
-            </td>
-                {% endfor %}
-            {% endwith %}
-        </tr>
-        <tr>
-            {% with 'n o p q r s t u v w x y z' as letters %}
-                {% for letter in letters.split %}
-            <td>
-                <button style="height:2.5em; width:2.5em;" type="button" data-letter="{{ letter }}" onclick="check_if_exists_in_word(this)">
-                    {{ letter }}
-                </button>
-            </td>
-                {% endfor %}
-            {% endwith %}
-        </tr>
-        </tbody>
-    </table>
-    <button onclick="window.location.href='{% url 'game' %}'">Start Again</button>
+<table>
+    <tr>
+        {% with 'a b c d e f g h i j k l m' as letters %}
+        {% for letter in letters.split %}
+        <td>
+            <button style="height:2.5em; width:2.5em;" type="button" data-letter="{{ letter }}"
+                    onclick="check_if_exists_in_word(this)">
+                {{ letter }}
+            </button>
+        </td>
+        {% endfor %}
+        {% endwith %}
+    </tr>
+    <tr>
+        {% with 'n o p q r s t u v w x y z' as letters %}
+        {% for letter in letters.split %}
+        <td>
+            <button style="height:2.5em; width:2.5em;" type="button" data-letter="{{ letter }}"
+                    onclick="check_if_exists_in_word(this)">
+                {{ letter }}
+            </button>
+        </td>
+        {% endfor %}
+        {% endwith %}
+    </tr>
+    </tbody>
+</table>
+<button onclick="window.location.href='{% url 'game' %}'">Start Again</button>
 
 {% endblock %}
 
@@ -53,21 +54,12 @@ function check_if_exists_in_word(button) {
     $.ajax({
         url: "{% url 'check' %}",
         contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
-        type: "GET",
+        type: "POST",
         data: {
             'letter': letter
         },
         success: function(guess, status, jqXHR) {
-            if( jqXHR.getResponseHeader('content-type').indexOf('text/html') >= 0 ) {
-                $("html").html(guess);
-            }
-            else {
-                if ( guess['failed'] !== 1 ) {
-                    for (let i = 0; i < guess['indexes'].length; i++) {
-                        $('#' + guess['indexes'][i]).text(letter);
-                    }
-                }
-            }
+                $("header").html(guess);
         }
     });
 }

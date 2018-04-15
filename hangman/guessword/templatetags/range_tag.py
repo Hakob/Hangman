@@ -83,7 +83,7 @@ def do_range(parser, token):
     bits = token.split_contents()
     if len(bits) != 4 or bits[2] != 'as':
         raise template.TemplateSyntaxError(
-            "%r expected format is '[start:][step:]end as name'" % bits[0]
+            "%r expected format is '[start:][step:]end as <iter>'" % bits[0]
         )
 
     var_name = bits[3]
@@ -101,6 +101,8 @@ def do_range(parser, token):
         start = rangebits[0]
         step = rangebits[1]
         end = rangebits[2]
+    else:
+        start, step, end = 0, 0, 0
 
     nodelist = parser.parse(('endrange',))
     parser.delete_first_token()

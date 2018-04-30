@@ -18,5 +18,6 @@ from django.urls import path, include
 
 urlpatterns = [
     path('', include('hangman.guessword.urls')),
+    path('auth/', include('hangman.players.urls')),
     path('admin/', admin.site.urls),
 ]

@@ -1,7 +1,8 @@
-import os
+from unipath import Path
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+REPO_DIR = Path(__file__).parent.parent.parent
 
+PROJECT_DIR = REPO_DIR.child('hangman')
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -10,8 +11,18 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'hangman.guessword',
 ]
+
+THIRD_PARTY_APPS = [
+
+]
+
+LOCAL_APPS = [
+    'hangman.guessword',
+    'hangman.players',
+]
+
+INSTALLED_APPS += THIRD_PARTY_APPS + LOCAL_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -28,7 +39,7 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'hangman', 'templates')],
+        'DIRS': [PROJECT_DIR.child('templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -70,9 +81,14 @@ USE_L10N = True
 
 USE_TZ = True
 
+STATIC_ROOT = PROJECT_DIR.parent.child('static')
 
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'hangman', 'static'),
+    PROJECT_DIR.child('static')
 ]
+
+MEDIA_ROOT = PROJECT_DIR.parent.child('media')
+
+MEDIA_URL = '/media/'

@@ -1,25 +1,27 @@
+from decouple import Config, RepositoryEnv
+
 from .base import *
 
-if 'DJANGO_SECRET_KEY' in os.environ:  # if hasattr(os.environ, 'DJANGO_SECRET_KEY')
-    SECRET_KEY = os.environ['DJANGO_SECRET_KEY']
-else:
-    print('SECRET_KEY value is hardcoded into settings')
-    SECRET_KEY = 'phx(0-_u(7-xg-5w28eao0&a5fxh6n47dbszex(5c)6i0mdb4f'
+DOTENV_FILE = REPO_DIR.child('.local.env')
+ENV_CONFIG = Config(RepositoryEnv(DOTENV_FILE))
 
-DEBUG = True
+SECRET_KEY = ENV_CONFIG.get('SECRET_KEY')
 
-ALLOWED_HOSTS = []
+DEBUG = ENV_CONFIG.get('DEBUG', cast=bool)
+
+ALLOWED_HOSTS = ENV_CONFIG.get('ALLOWED_HOSTS').split(',')
+
 
 MIDDLEWARE.remove('django.middleware.csrf.CsrfViewMiddleware')
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.file'
-SESSION_FILE_PATH = BASE_DIR + '\\django_sessions'
+SESSION_FILE_PATH = REPO_DIR.child('django_sessions')
 SESSION_SAVE_EVERY_REQUEST = True
 
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'NAME': REPO_DIR.child('db.sqlite3'),
     }
 }

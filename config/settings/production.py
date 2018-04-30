@@ -1,14 +1,16 @@
+from decouple import Config, RepositoryEnv
+
 from .base import *
 
-if 'DJANGO_SECRET_KEY' in os.environ:
-    SECRET_KEY = os.environ['DJANGO_SECRET_KEY']
-else:
-    print('SECRET_KEY value is hardcoded into settings')
-    SECRET_KEY = '5w28vnidfphx(0-_u(7-xg-vdivja5fxh6n47dbszex(5c)6i0mdb4f'
+DOTENV_FILE = REPO_DIR.child('.prod.env')
+ENV_CONFIG = Config(RepositoryEnv(DOTENV_FILE))
 
-DEBUG = False
+SECRET_KEY = ENV_CONFIG.get('SECRET_KEY')
 
-ALLOWED_HOSTS = ['127.0.0.1']
+DEBUG = ENV_CONFIG.get('DEBUG', cast=bool)
+
+ALLOWED_HOSTS = ENV_CONFIG.get('ALLOWED_HOSTS').split(',')
+
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
@@ -16,7 +18,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'OPTIONS': {
-            'read_default_file': os.path.join(BASE_DIR, 'my.cnf'),
+            'read_default_file': REPO_DIR.child('my.cnf'),
         }
     }
 }

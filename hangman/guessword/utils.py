@@ -47,4 +47,8 @@ def initialize_session(request):
 
 
 def clear_session(request):
-    request.session.flush()
+    # request.session.flush()
+    if hasattr(request.session, 'chances'):
+        del request.session['word_letters']
+        del request.session['guessed_letters']
+        del request.session['chances']

@@ -4,15 +4,41 @@
 <head>
     <meta charset="UTF-8">
     <title>Hangman</title>
+
 </head>
 
 <body>
-    <header>
-    {% block header %} {% endblock %}
-    </header>
-    <main>
-        {% block keyboard %} {% endblock %}
-    </main>
+<div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+
+        {% if request.user.is_authenticated %}
+
+            <li class="nav-item">
+                {# URL provided by django-allauth/account/urls.py #}
+                <a class="nav-link" href="{% url 'logout' %}">Sign Out</a>
+            </li>
+            </ul>
+            </div>
+            <header>
+                {% block header %} {% endblock %}
+            </header>
+            <main>
+                {% block keyboard %} {% endblock %}
+            </main>
+        {% else %}
+            <li class="nav-item">
+                {# URL provided by django-allauth/account/urls.py #}
+                <a id="sign-up-link" class="nav-link" href="{% url 'signup' %}">Sign Up</a>
+            </li>
+            <li class="nav-item">
+                {# URL provided by django-allauth/account/urls.py #}
+                <a id="log-in-link" class="nav-link" href="{% url 'login' %}">Sign In</a>
+            </li>
+            </ul>
+            </div>
+        {% endif %}
+
+
 {% block scripts %} {% endblock %}
 </body>
 </html>

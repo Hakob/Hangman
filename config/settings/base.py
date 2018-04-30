@@ -4,7 +4,7 @@ REPO_DIR = Path(__file__).parent.parent.parent
 
 PROJECT_DIR = REPO_DIR.child('hangman')
 
-INSTALLED_APPS = [
+DJANGO_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -22,7 +22,7 @@ LOCAL_APPS = [
     'hangman.players',
 ]
 
-INSTALLED_APPS += THIRD_PARTY_APPS + LOCAL_APPS
+INSTALLED_APPS = LOCAL_APPS + THIRD_PARTY_APPS + DJANGO_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

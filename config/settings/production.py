@@ -2,7 +2,7 @@ from decouple import Config, RepositoryEnv
 
 from .base import *
 
-DOTENV_FILE = REPO_DIR.child('.prod.env')
+DOTENV_FILE = REPO_DIR.child('prod.env')
 ENV_CONFIG = Config(RepositoryEnv(DOTENV_FILE))
 
 SECRET_KEY = ENV_CONFIG.get('SECRET_KEY')
